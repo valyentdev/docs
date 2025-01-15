@@ -1,0 +1,110 @@
+{
+  "$schema": "https://mintlify.com/schema.json",
+  "name": "Valyent Documentation",
+  "logo": {
+    "dark": "/logo/dark.svg",
+    "light": "/logo/light.svg"
+  },
+  "favicon": "/favicon.svg",
+  "theme": "quill",
+  "modeToggle": {
+    "default": "light",
+    "isHidden": true
+  },
+  "rounded": "default",
+  "colors": {
+    "primary": "#1d4ed8",
+    "light": "#eff6ff",
+    "dark": "#1d4ed8",
+    "background": {
+      "dark": "#172554"
+    },
+    "anchors": {
+      "from": "#2563eb",
+      "to": "#eff6ff"
+    }
+  },
+  "topbarLinks": [
+    {
+      "name": "Support",
+      "url": "mailto:contact@valyent.cloud"
+    }
+  ],
+  "topbarCtaButton": {
+    "name": "Get Started",
+    "url": "https://console.valyent.cloud"
+  },
+  "anchors": [
+    {
+      "name": "API Reference",
+      "openapi": "/api-reference/openapi.yaml",
+      "url": "api-reference",
+      "icon": "square-terminal"
+    },
+    {
+      "name": "Blog",
+      "icon": "newspaper",
+      "url": "https://valyent.substack.com"
+    },
+    {
+      "name": "Community",
+      "icon": "discord",
+      "url": "https://discord.gg/WZCXG3SZQt"
+    },
+    {
+      "name": "GitHub",
+      "icon": "github",
+      "url": "https://github.com/ValyentDev"
+    }
+  ],
+  "navigation": [
+    {
+      "group": "Get Started",
+      "pages": [
+        "introduction",
+        "pricing",
+        "glossary",
+        {
+          "group": "Deployment Guides",
+          "icon": "rocket",
+          "pages": [
+            "guides/adonis",
+            "guides/dotnet",
+            "guides/laravel",
+            "guides/nextjs",
+            "guides/remix",
+            "guides/angular",
+            "guides/fastapi",
+            "guides/nestjs",
+            "guides/rails"
+          ]
+        },
+        {
+          "group": "Infrastructure-as-Code",
+          "icon": "brackets-curly",
+          "pages": [
+            "infrastructure-as-code/go",
+            "infrastructure-as-code/typescript"
+          ]
+        }
+      ]
+    },
+    {
+      "group": "Legal",
+      "pages": [
+        "legal/terms-of-service",
+        "legal/privacy-policy",
+        "legal/subprocessors"
+      ]
+    },
+    {
+      "group": "API Documentation",
+      "pages": ["api-reference/introduction"]
+    }
+  ],
+  "footerSocials": {
+    "x": "https://x.com/valyentcloud",
+    "github": "https://github.com/valyentdev",
+    "linkedin": "https://www.linkedin.com/company/valyent"
+  }
+}

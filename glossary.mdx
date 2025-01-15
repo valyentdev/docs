@@ -1,0 +1,42 @@
+---
+title: Glossary
+description: "Learn about the terms and concepts used in Valyent's products and documentation."
+icon: book-open
+---
+
+Valyent makes use of a set of terms and concepts that are important to understand in order to use the platform effectively.
+And since they may vary from the common terminology used in the cloud computing industry, we've compiled a glossary to help you navigate through them.
+
+## Glossary
+
+### Fleet
+
+A **fleet** is a collection of machines that work together to provide a service.
+
+We also make use of the term **application** to refer to a fleet, as it is a more user-friendly term.
+
+### Machine
+
+A **machine** is a OCI (Docker) image made a fast-booting microVM, that can be started, stopped, monitored, and much more.
+
+The machine is the basic unit of computation in Valyent, and it is the building block of a fleet.
+
+Making use of such a lightweight and fast-booting microVM allows for a granular control over your infrastructure while abstracting away the complexities of managing individual servers.
+
+As a cloud platform, it also allows Valyent to provide a more secure environment for running untrusted code.
+
+### Gateway
+
+A **gateway** is a bridge between the public internet and the private network of a fleet.
+
+By specifying a gateway, you can expose the services running in your fleet to the public internet.
+
+For example, if you have a web server running in one machine of you fleet on port 8080, you can expose it to the public internet by setting the gateway to the machine running the web server and the port to 8080.
+
+Our proxy will then route the traffic from the public internet to the machine running the web server.
+
+### AI Sandbox
+
+An **AI Sandbox** is a temporary machine that is optimized for running untrusted LLM-generated code.
+
+By default, it runs an OCI image made to make it easy to start working with LLM-generated code.

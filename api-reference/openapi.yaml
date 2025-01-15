@@ -1,0 +1,886 @@
+components:
+  schemas:
+    CreateFleetBody:
+      additionalProperties: false
+      properties:
+        name:
+          type: string
+      required:
+        - name
+      type: object
+    CreateGatewayOptions:
+      additionalProperties: false
+      properties:
+        name:
+          type: string
+        target_port:
+          format: int64
+          type: integer
+      required:
+        - name
+        - target_port
+      type: object
+    CreateMachineOptions:
+      additionalProperties: false
+      properties:
+        config:
+          $ref: "#/components/schemas/MachineConfig"
+        region:
+          type: string
+        skip_start:
+          type: boolean
+      required:
+        - region
+        - config
+        - skip_start
+      type: object
+    CreateNamespaceBody:
+      additionalProperties: false
+      properties:
+        name:
+          type: string
+      required:
+        - name
+      type: object
+    ErrorDetail:
+      additionalProperties: false
+      properties:
+        location:
+          description: Where the error occurred, e.g. 'body.items[3].tags' or 'path.thing-id'
+          type: string
+        message:
+          description: Error message text
+          type: string
+        value:
+          description: The value at the given location
+      type: object
+    Fleet:
+      additionalProperties: false
+      properties:
+        created_at:
+          format: date-time
+          type: string
+        destroyed:
+          type: boolean
+        id:
+          type: string
+        name:
+          type: string
+        namespace:
+          type: string
+      required:
+        - id
+        - namespace
+        - name
+        - created_at
+        - destroyed
+      type: object
+    Gateway:
+      additionalProperties: false
+      properties:
+        fleet_id:
+          type: string
+        id:
+          type: string
+        name:
+          type: string
+        namespace:
+          type: string
+        protocol:
+          type: string
+        target_port:
+          format: int64
+          type: integer
+      required:
+        - id
+        - name
+        - namespace
+        - fleet_id
+        - protocol
+        - target_port
+      type: object
+    GuestConfig:
+      additionalProperties: false
+      properties:
+        cpu_kind:
+          type: string
+        cpus:
+          format: int64
+          minimum: 1
+          type: integer
+        memory_mb:
+          format: int64
+          minimum: 1
+          type: integer
+      required:
+        - cpu_kind
+        - memory_mb
+        - cpus
+      type: object
+    InitConfig:
+      additionalProperties: false
+      properties:
+        cmd:
+          items:
+            type: string
+          type:
+            - array
+            - "null"
+        entrypoint:
+          items:
+            type: string
+          type:
+            - array
+            - "null"
+        user:
+          type: string
+      type: object
+    Machine:
+      additionalProperties: false
+      properties:
+        config:
+          $ref: "#/components/schemas/MachineConfig"
+        created_at:
+          format: date-time
+          type: string
+        fleet:
+          type: string
+        id:
+          type: string
+        instance_id:
+          type: string
+        machine_version:
+          type: string
+        namespace:
+          type: string
+        region:
+          type: string
+        state:
+          type: string
+        updated_at:
+          format: date-time
+          type: string
+      required:
+        - id
+        - namespace
+        - fleet
+        - instance_id
+        - machine_version
+        - region
+        - config
+        - created_at
+        - updated_at
+        - state
+      type: object
+    MachineConfig:
+      additionalProperties: false
+      properties:
+        auto_destroy:
+          type: boolean
+        guest:
+          $ref: "#/components/schemas/GuestConfig"
+        stop_config:
+          $ref: "#/components/schemas/StopConfig"
+        workload:
+          $ref: "#/components/schemas/Workload"
+      required:
+        - guest
+        - workload
+      type: object
+    MachineVersion:
+      additionalProperties: false
+      properties:
+        config:
+          $ref: "#/components/schemas/MachineConfig"
+        id:
+          type: string
+        machine_id:
+          type: string
+      required:
+        - id
+        - machine_id
+        - config
+      type: object
+    Namespace:
+      additionalProperties: false
+      properties:
+        created_at:
+          format: date-time
+          type: string
+        name:
+          type: string
+      required:
+        - name
+        - created_at
+      type: object
+    Node:
+      additionalProperties: false
+      properties:
+        address:
+          type: string
+        heartbeated_at:
+          format: date-time
+          type: string
+        id:
+          type: string
+        region:
+          type: string
+      required:
+        - id
+        - address
+        - region
+        - heartbeated_at
+      type: object
+    RavelError:
+      additionalProperties: false
+      properties:
+        code:
+          type: string
+        detail:
+          type: string
+        errors:
+          items:
+            $ref: "#/components/schemas/ErrorDetail"
+          type:
+            - array
+            - "null"
+        status:
+          format: int64
+          type: integer
+        title:
+          type: string
+      required:
+        - code
+        - status
+        - title
+        - detail
+      type: object
+    RestartPolicyConfig:
+      additionalProperties: false
+      properties:
+        max_retries:
+          format: int64
+          type: integer
+        policy:
+          type: string
+      type: object
+    StopConfig:
+      additionalProperties: false
+      properties:
+        signal:
+          type: string
+        timeout:
+          format: int64
+          type: integer
+      type: object
+    Workload:
+      additionalProperties: false
+      properties:
+        env:
+          items:
+            type: string
+          type:
+            - array
+            - "null"
+        image:
+          type: string
+        init:
+          $ref: "#/components/schemas/InitConfig"
+        restart_policy:
+          $ref: "#/components/schemas/RestartPolicyConfig"
+        type:
+          type: string
+      required:
+        - type
+        - image
+      type: object
+info:
+  title: Ravel API
+  version: 1.0.0
+openapi: 3.1.0
+paths:
+  /fleets:
+    get:
+      operationId: listFleets
+      parameters:
+        - explode: false
+          in: query
+          name: namespace
+          schema:
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: "#/components/schemas/Fleet"
+                type:
+                  - array
+                  - "null"
+          description: OK
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RavelError"
+          description: Error
+      summary: List fleets
+      tags:
+        - Fleets
+    post:
+      operationId: createFleet
+      parameters:
+        - explode: false
+          in: query
+          name: namespace
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateFleetBody"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Fleet"
+          description: OK
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RavelError"
+          description: Error
+      summary: Create a fleet
+      tags:
+        - Fleets
+  /fleets/{fleet}:
+    delete:
+      operationId: destroyFleet
+      parameters:
+        - explode: false
+          in: query
+          name: namespace
+          schema:
+            type: string
+        - in: path
+          name: fleet
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: No Content
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RavelError"
+          description: Error
+      summary: Destroy a fleet
+      tags:
+        - Fleets
+    get:
+      operationId: getFleet
+      parameters:
+        - explode: false
+          in: query
+          name: namespace
+          schema:
+            type: string
+        - in: path
+          name: fleet
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Fleet"
+          description: OK
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RavelError"
+          description: Error
+      summary: Get a fleet
+      tags:
+        - Fleets
+  /fleets/{fleet}/gateways:
+    get:
+      operationId: listGateways
+      parameters:
+        - explode: false
+          in: query
+          name: namespace
+          schema:
+            type: string
+        - in: path
+          name: fleet
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: "#/components/schemas/Gateway"
+                type:
+                  - array
+                  - "null"
+          description: OK
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RavelError"
+          description: Error
+      summary: List gateways
+      tags:
+        - Fleets
+    post:
+      operationId: createGateway
+      parameters:
+        - explode: false
+          in: query
+          name: namespace
+          schema:
+            type: string
+        - in: path
+          name: fleet
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateGatewayOptions"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Gateway"
+          description: OK
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RavelError"
+          description: Error
+      summary: Create a gateway
+      tags:
+        - Fleets
+  /fleets/{fleet}/gateways/{gateway}:
+    delete:
+      operationId: destroyGateway
+      parameters:
+        - explode: false
+          in: query
+          name: namespace
+          schema:
+            type: string
+        - in: path
+          name: fleet
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: gateway
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: No Content
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RavelError"
+          description: Error
+      summary: Destroy a gateway
+      tags:
+        - Fleets
+    get:
+      operationId: getGateway
+      parameters:
+        - explode: false
+          in: query
+          name: namespace
+          schema:
+            type: string
+        - in: path
+          name: fleet
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: gateway
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Gateway"
+          description: OK
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RavelError"
+          description: Error
+      summary: Get a gateway
+      tags:
+        - Fleets
+  /fleets/{fleet}/machines:
+    get:
+      operationId: listMachines
+      parameters:
+        - explode: false
+          in: query
+          name: namespace
+          schema:
+            type: string
+        - in: path
+          name: fleet
+          required: true
+          schema:
+            type: string
+        - explode: false
+          in: query
+          name: destroyed
+          schema:
+            type: boolean
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: "#/components/schemas/Machine"
+                type:
+                  - array
+                  - "null"
+          description: OK
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RavelError"
+          description: Error
+      summary: List machines
+      tags:
+        - Machines
+    post:
+      operationId: createMachine
+      parameters:
+        - explode: false
+          in: query
+          name: namespace
+          schema:
+            type: string
+        - in: path
+          name: fleet
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateMachineOptions"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Machine"
+          description: OK
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RavelError"
+          description: Error
+      summary: Create a machine
+      tags:
+        - Machines
+  /fleets/{fleet}/machines/{machine_id}:
+    delete:
+      operationId: destroyMachine
+      parameters:
+        - explode: false
+          in: query
+          name: namespace
+          schema:
+            type: string
+        - in: path
+          name: fleet
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: machine_id
+          required: true
+          schema:
+            type: string
+        - explode: false
+          in: query
+          name: force
+          schema:
+            type: boolean
+      responses:
+        "204":
+          description: No Content
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RavelError"
+          description: Error
+      summary: Destroy a machine
+      tags:
+        - Machines
+    get:
+      operationId: getMachine
+      parameters:
+        - explode: false
+          in: query
+          name: namespace
+          schema:
+            type: string
+        - in: path
+          name: fleet
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: machine_id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Machine"
+          description: OK
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RavelError"
+          description: Error
+      summary: Get a machine
+      tags:
+        - Machines
+  /fleets/{fleet}/machines/{machine_id}/logs:
+    get:
+      operationId: getMachineLogs
+      parameters:
+        - explode: false
+          in: query
+          name: namespace
+          schema:
+            type: string
+        - in: path
+          name: fleet
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: machine_id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: OK
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RavelError"
+          description: Error
+      summary: Get machine logs
+      tags:
+        - Machines
+  /fleets/{fleet}/machines/{machine_id}/logs/follow:
+    get:
+      operationId: subscribeToMachineLogs
+      parameters:
+        - explode: false
+          in: query
+          name: namespace
+          schema:
+            type: string
+        - in: path
+          name: fleet
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: machine_id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RavelError"
+          description: Error
+      summary: Subscribe to machine logs
+      tags:
+        - Machines
+  /fleets/{fleet}/machines/{machine_id}/start:
+    post:
+      operationId: startMachine
+      parameters:
+        - explode: false
+          in: query
+          name: namespace
+          schema:
+            type: string
+        - in: path
+          name: fleet
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: machine_id
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: No Content
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RavelError"
+          description: Error
+      summary: Start a machine
+      tags:
+        - Machines
+  /fleets/{fleet}/machines/{machine_id}/stop:
+    post:
+      operationId: stopMachine
+      parameters:
+        - explode: false
+          in: query
+          name: namespace
+          schema:
+            type: string
+        - in: path
+          name: fleet
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: machine_id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StopConfig"
+      responses:
+        "204":
+          description: No Content
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RavelError"
+          description: Error
+      summary: Stop a machine
+      tags:
+        - Machines
+  /fleets/{fleet}/machines/{machine_id}/versions:
+    get:
+      operationId: listMachineVersions
+      parameters:
+        - explode: false
+          in: query
+          name: namespace
+          schema:
+            type: string
+        - in: path
+          name: fleet
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: machine_id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: "#/components/schemas/MachineVersion"
+                type:
+                  - array
+                  - "null"
+          description: OK
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RavelError"
+          description: Error
+      summary: List machine versions
+      tags:
+        - Machines
+  /nodes:
+    get:
+      operationId: listNodes
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: "#/components/schemas/Node"
+                type:
+                  - array
+                  - "null"
+          description: OK
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RavelError"
+          description: Error
+      summary: List nodes
+      tags:
+        - Nodes

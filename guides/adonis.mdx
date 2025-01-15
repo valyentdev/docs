@@ -1,0 +1,139 @@
+---
+title: AdonisJS
+description: "Learn how to deploy an AdonisJS 5 application to Valyent"
+---
+
+## Introduction
+
+[Adonis](https://adonisjs.com/) is a fully featured web framework for Node.js. In this article, we are going to deploy a freshly created AdonisJS application to Valyent.
+
+## Prerequisites
+
+- a UNIX-like system (see [WSL](https://learn.microsoft.com/en-us/windows/wsl/install) if you are using Windows), in order to use the [Valyent CLI](https://docs.valyent.cloud/cli)
+- a Valyent account, with a registered payment method (you can sign up [here](https://console.valyent.cloud/auth/sign-up))
+- [NodeJS](https://nodejs.org) and [NPM](https://www.npmjs.com) installed on your machine
+
+## Installing the CLI
+
+```bash
+curl -L https://cli.valyent.cloud/install.sh | sh
+```
+
+You can inspect the installation script [here](https://cli.valyent.cloud/install.sh) and the [GitHub repository](https://github.com/valyentdev/cli).
+
+## Authenticating
+
+```bash
+valyent auth login
+```
+
+## Initializing the project
+
+In the first place, we are going to set up a new AdonisJS project. You can refer to the [official documentation](https://docs.adonisjs.com/guides/installation).
+
+```bash
+npm init adonis-ts-app@latest <some_project_name> && cd <some_project_name>
+```
+
+You can select the project structure you want. For this guide, we are going to select the `web` project structure.
+
+Now, we can initialize the `valyent.toml` configuration file, that allows to link the local codebase, to a Valyent application :
+
+```bash
+valyent init
+```
+
+This command will ask you to select/create a project and an associated application.
+
+## Adding the Dockerfile
+
+Let’s add a Dockerfile so that Valyent can build a Docker image for your application.
+
+```bash
+touch Dockerfile
+```
+
+We can fill it with the following Dockerfile (coming from this [cookbook](https://docs.adonisjs.com/cookbooks/dockerizing-adonis)) :
+
+```bash
+FROM node:20.12.2-alpine3.18 AS base
+
+# All deps stage
+FROM base AS deps
+WORKDIR /app
+ADD package.json package-lock.json ./
+RUN npm ci
+
+# Production only deps stage
+FROM base AS production-deps
+WORKDIR /app
+ADD package.json package-lock.json ./
+RUN npm ci --omit=dev
+
+# Build stage
+FROM base AS build
+WORKDIR /app
+COPY --from=deps /app/node_modules /app/node_modules
+ADD . .
+RUN node ace build
+
+# Production stage
+FROM base
+ENV NODE_ENV=production
+WORKDIR /app
+COPY --from=production-deps /app/node_modules /app/node_modules
+COPY --from=build /app/build /app
+EXPOSE 8080
+CMD ["node", "./bin/server.js"]
+```
+
+## Setting environment variables
+
+### Option 1
+
+We can set environment variables using the `valyent env set` command :
+
+```bash
+valyent env set PORT=3333 HOST=0.0.0.0 NODE_ENV=development APP_KEY=<my_app_key> DRIVE_DISK=local SESSION_DRIVER=cookie CACHE_VIEWS=true
+```
+
+### Option 2
+
+We are also able to load environment variables from a `.env` file :
+
+```bash
+touch .env.prod
+```
+
+```bash
+# .env.prod
+PORT=3333
+HOST=0.0.0.0
+NODE_ENV=development
+APP_KEY=<my_app_key>
+DRIVE_DISK=local
+SESSION_DRIVER=cookie
+CACHE_VIEWS=true
+```
+
+```bash
+valyent env load .env.prod
+```
+
+Don’t forget to add the `.env.prod` file to your `.gitignore` file.
+
+## Deploy the project
+
+Then, we can deploy the application :
+
+```bash
+valyent deploy
+```
+
+Once the deployment is finished, type :
+
+```bash
+valyent open
+```
+
+to see your Adonis application in your browser.
