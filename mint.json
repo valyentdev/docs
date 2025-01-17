@@ -85,14 +85,6 @@
       ]
     },
     {
-      "group": "Legal",
-      "pages": [
-        "legal/terms-of-service",
-        "legal/privacy-policy",
-        "legal/subprocessors"
-      ]
-    },
-    {
       "group": "API Documentation",
       "pages": ["api-reference/introduction"]
     }
