@@ -7,7 +7,11 @@ description: "Official Go SDK for interacting with the Valyent Cloud platform."
 ## Installation
 
 ```bash
+# Valyent SDK
 go get github.com/valyentdev/valyent.go
+
+# Ravel Types (very useful)
+go get github.com/valyentdev/ravel/api
 ```
 
 ## Quick Start
@@ -18,6 +22,7 @@ package main
 import (
     "fmt"
     "github.com/valyentdev/valyent.go"
+    "github.com/valyentdev/ravel/api"
 )
 
 func main() {
@@ -177,7 +182,7 @@ redeploy, err := client.SetEnvironmentVariables(namespace, fleetID, []string{
 deployment, err := client.CreateDeployment(
     namespace,
     fleetID,
-    valyent.CreateDeploymentPayload{
+    api.CreateDeploymentPayload{
         Machine: machineConfig,
     },
     tarballReader,
