@@ -1,0 +1,227 @@
+---
+title: "CLI"
+description: "Explore how to use the CLI to interact with Valyent."
+icon: square-terminal
+---
+
+## Installation
+
+```bash
+curl -L https://cli.valyent.cloud | sh
+```
+
+## Authentication
+
+### Login
+
+```bash
+valyent auth login
+```
+
+The login command provides two authentication methods:
+- Browser-based authentication (recommended)
+- Manual API key entry from the Valyent dashboard
+
+### Logout
+
+```bash
+valyent auth logout
+```
+
+Removes stored credentials from your machine.
+
+## Project Initialization
+
+### Initialize a New Project
+
+```bash
+valyent init [--fleet|-f <fleet-id>]
+```
+
+Creates a new `valyent.json` configuration file in your current directory. You can either:
+- Specify a fleet ID directly using the `--fleet` flag
+- Select an existing fleet or create a new one through an interactive prompt
+
+## Fleets
+
+Fleets are groups of machines that can be managed together.
+
+### Create a Fleet
+
+```bash
+valyent fleets create [--name|-f <fleet-name>]
+```
+
+### List Fleets
+
+```bash
+valyent fleets list
+```
+
+### Delete a Fleet
+
+```bash
+valyent fleets delete [--fleet|-f <fleet-id>]
+```
+
+## Machines
+
+Machines are the compute instances running your workloads.
+
+### List Machines
+
+```bash
+valyent machines list
+```
+
+### Create a Machine
+
+```bash
+valyent machines create --json-file <config-file>
+```
+
+Example machine configuration (`machine-config.json`):
+```json
+{
+  "region": "gra-1",
+  "skip_start": false,
+  "config": {
+    "image": "docker.io/codercom/code-server:latest",
+    "workload": {
+      "env": [
+        "SUDO_PASSWORD=password",
+        "PASSWORD=password"
+      ],
+      "restart": {
+        "policy": "always"
+      },
+      "init": {
+        "user": "root"
+      }
+    },
+    "gateway_enabled": true,
+    "guest": {
+      "cpu_kind": "eco",
+      "cpus": 1,
+      "memory_mb": 512
+    }
+  }
+}
+```
+
+Configuration fields:
+- `region`: The region where the machine will be deployed (e.g., "gra-1")
+- `skip_start`: Whether to skip starting the machine after creation
+- `config`:
+  - `image`: Docker image to use for the machine
+  - `workload`:
+    - `env`: Array of environment variables
+    - `restart.policy`: Container restart policy
+    - `init.user`: User to run the container as
+  - `gateway_enabled`: Whether to enable gateway access
+  - `guest`:
+    - `cpu_kind`: Type of CPU ("eco" for economical)
+    - `cpus`: Number of CPU cores
+    - `memory_mb`: Memory allocation in megabytes
+
+### Machine Operations
+
+```bash
+# Start a machine
+valyent machines start
+
+# Stop a machine
+valyent machines stop
+
+# Delete a machine
+valyent machines delete [--fleet|-f <fleet-id>] [--machine|-m <machine-id>]
+
+# View machine logs
+valyent machines logs [--follow|-f]
+
+# View machine events
+valyent machines events
+```
+
+## Gateways
+
+Gateways manage incoming traffic to your applications.
+
+### Create a Gateway
+
+```bash
+valyent gateways create
+```
+
+Interactive prompt will ask for:
+- Gateway name
+- Target port
+
+### List Gateways
+
+```bash
+valyent gateways list
+```
+
+### Delete a Gateway
+
+```bash
+valyent gateways delete [--gateway|-g <gateway-id>] [--confirmed|-c]
+```
+
+## Environment Variables
+
+### List Environment Variables
+
+```bash
+valyent env list [--fleet|-f <fleet-id>]
+```
+
+### Set Environment Variables
+
+```bash
+valyent env set <KEY>=<VALUE> [--fleet|-f <fleet-id>]
+```
+
+Example:
+```bash
+valyent env set DATABASE_URL=postgresql://username:password@host:5432/mydb
+```
+
+### Load Environment Variables from File
+
+```bash
+valyent env load <file-path> [--fleet|-f <fleet-id>]
+```
+
+Supports loading variables from files like `.env`
+
+## Deployment
+
+### Deploy Project
+
+```bash
+valyent deploy
+```
+
+Deploys your project to Valyent by:
+1. Reading the project configuration from `valyent.json`
+2. Creating a tarball of your codebase (excluding `.git`, `node_modules`, and paths in `.dockerignore`)
+3. Uploading and creating a new deployment
+4. Streaming build logs in real-time
+
+### Open Deployed Application
+
+```bash
+valyent open
+```
+
+Opens your deployed application in the default web browser.
+
+## Notes
+
+- The CLI supports various aliases for commands (e.g., `fleet` for `fleets`, `gateway` for `gateways`)
+- Most commands that require a fleet ID will prompt you to select one if not specified
+- The CLI includes built-in confirmation prompts for destructive operations
+- Environment variables can be loaded from `.env` files or set individually
+- Build and deployment logs are streamed in real-time for better visibility

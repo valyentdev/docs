@@ -58,6 +58,7 @@
       "pages": [
         "introduction",
         "glossary",
+        "cli",
         {
           "group": "Deployment Guides",
           "icon": "rocket",
